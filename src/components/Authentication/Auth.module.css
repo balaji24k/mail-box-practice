@@ -1,9 +1,7 @@
 .box {
     margin: 150px auto;
     width: 35rem;
-    background-size: cover;
     padding: 25px;
-    text-align: left;
     background-color: rgb(32, 2, 88);
     border-radius: 20px;
   }
@@ -11,5 +9,15 @@
     color: white;
     text-align: center;
   }
+
+  .label {
+    color: white;
+  }
+
+  .navlink {
+    color: white; 
+    padding-top: 1rem; 
+  }
+  
 
   

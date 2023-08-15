@@ -3,10 +3,13 @@ import classes from "./Auth.module.css";
 import { Button, Form, Nav } from "react-bootstrap";
 import { useRef } from "react";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
-import {NavLink} from "react-router-dom";
+import {NavLink, useHistory} from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { authActions } from "../../store/AuthSlice";
 
 const LoginPage = () => {
-  
+  const history = useHistory();
+  const dispatch = useDispatch();
 
 	const emailInputRef = useRef();
   const passwordInputRef = useRef();
@@ -45,9 +48,11 @@ const LoginPage = () => {
       )
       .then((res) => {
         if (res.ok) {
-          console.log("Login succesfullly");
+          // console.log("Login succesfullly");
           return res.json().then((data) => {
             console.log(data, "data ");
+            dispatch(authActions.login({token: data.idToken, email: data.email}))
+            history.replace("/inbox");
           });
         } else {
           return res.json().then((data) => {
@@ -67,12 +72,12 @@ const LoginPage = () => {
       <h1>Login</h1>
       <Form onSubmit={submitHandler}>
         <Form.Group className="mb-3">
-          <Form.Label style={{ color: "white" }}>Email</Form.Label>
+          <Form.Label className={classes.label} >Email</Form.Label>
           <Form.Control type="text" placeholder="Email" ref={emailInputRef} />
         </Form.Group>
 
         <Form.Group className="mb-3">
-          <Form.Label style={{ color: "white" }}>Password</Form.Label>
+          <Form.Label className={classes.label} >Password</Form.Label>
           <div className="input-group">
             <Form.Control
               type={showPassword ? "text" : "password"}
@@ -91,7 +96,7 @@ const LoginPage = () => {
         <Button type="submit" variant="primary">Login</Button>
 
         <Nav>
-          <NavLink to="signup" style={{ color: "white", paddingTop: "1rem" }}>
+          <NavLink to="signup" className={classes.navlink} >
             Don't have an Account?
           </NavLink>
         </Nav>

@@ -2,7 +2,7 @@
 const SentBox = () => {
     return (
         <div>
-            
+            Sentbox
         </div>
     )
 };

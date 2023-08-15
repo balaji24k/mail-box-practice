@@ -5,7 +5,7 @@ import { NavLink, useHistory } from "react-router-dom";
 import { BsEye, BsEyeSlash } from "react-icons/bs";
 
 const SignUpPage = () => {
-  const emailInpurRef = useRef();
+  const emailInputRef = useRef();
   const passwordInputRef = useRef();
   const confirmpasswordInputRef = useRef();
 
@@ -25,7 +25,7 @@ const SignUpPage = () => {
   const submitHandler = (event) => {
     event.preventDefault();
 
-    const enteredEmail = emailInpurRef.current.value;
+    const enteredEmail = emailInputRef.current.value;
     const enteredPassword = passwordInputRef.current.value;
     const confirmpassword = confirmpasswordInputRef.current.value;
 
@@ -33,7 +33,7 @@ const SignUpPage = () => {
       alert("Password and confirm password must match");
     } 
 		else {
-      emailInpurRef.current.value = "";
+      emailInputRef.current.value = "";
       passwordInputRef.current.value = "";
       confirmpasswordInputRef.current.value = "";
       fetch(
@@ -51,7 +51,7 @@ const SignUpPage = () => {
         }
       ).then((res) => {
         if (res.ok) {
-          console.log("Account created succesfullly");
+          // console.log("Account created succesfullly");
           alert("Account created succesful");
           history.replace("/login");
         } else {
@@ -73,16 +73,16 @@ const SignUpPage = () => {
       <h1>SignUp</h1>
       <Form onSubmit={submitHandler}>
         <Form.Group className="mb-3">
-          <Form.Label style={{ color: "white" }}>Email</Form.Label>
+          <Form.Label className={classes.label} >Email</Form.Label>
           <Form.Control
             type="text"
             placeholder="Email"
             required
-            ref={emailInpurRef}
+            ref={emailInputRef}
           />
         </Form.Group>
         <Form.Group className="mb-3">
-          <Form.Label style={{ color: "white" }}>Password</Form.Label>
+          <Form.Label className={classes.label} >Password</Form.Label>
           <div className="input-group">
             <Form.Control
               type={showPassword ? "text" : "password"}
@@ -99,12 +99,12 @@ const SignUpPage = () => {
         </Form.Group>
 
         <Form.Group className="mb-3 ">
-          <Form.Label style={{ color: "white" }}>Confirm Password</Form.Label>
+          <Form.Label className={classes.label} >Confirm Password</Form.Label>
           <div className="input-group">
             <Form.Control
               type={showConfirmPassword ? "text" : "password"}
               placeholder="Password"
-              ref={passwordInputRef}
+              ref={confirmpasswordInputRef}
             />
             <Button
               className="input-group-append"
@@ -121,7 +121,7 @@ const SignUpPage = () => {
           </Button>
         </div>
         <Nav>
-          <NavLink to="/login" style={{ color: "white", paddingTop: "1rem" }}>
+          <NavLink to="/login" className={classes.navlink} >
             Have an Account?
           </NavLink>
         </Nav>

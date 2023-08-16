@@ -30,7 +30,7 @@ const ComposeMail = () => {
     const receiverName = receiverEmail.split("@")[0];
 
     const sentMessage = {
-      toEmail : receiverEmail,
+      toMail : receiverEmail,
       to: receiverName,
       subject: subjectRef.current.value,
       content: editorState.getCurrentContent().getPlainText(),

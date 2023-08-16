@@ -1,16 +1,16 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom/cjs/react-router-dom.min";
-import classes from "./TotalMail.module.css";
+import classes from "./InboxView.module.css";
 import { NavLink } from "react-router-dom/cjs/react-router-dom.min";
 import { Button } from "react-bootstrap";
 
-const TotalMail = () => {
+const InboxView = () => {
 	const userEmail = localStorage.getItem("email");
 	const userName = userEmail.split("@")[0]
 	const {id} = useParams();
 
 	const [mail,setMail] = useState({});
-	// console.log(mail,"mail total mail")
+	console.log(classes,"classes inboxview")
 
 	useEffect(() => {
 		fetch(
@@ -43,4 +43,4 @@ const TotalMail = () => {
 	)
 }
 
-export default TotalMail;
+export default InboxView;

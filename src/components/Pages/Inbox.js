@@ -38,20 +38,28 @@ const Inbox = () => {
       });
   }, [userName]);
 
-  
   const openMail = (mail) => {
     // console.log(mail,"main inbox");
-    const updatedMail = {...mail, isRead : true};
-    const mailIndex = mails.findIndex(i => i.id === mail.id);
-    const updatedMails = [...mails]
+    const updatedMail = { ...mail, isRead: true };
+    const mailIndex = mails.findIndex((i) => i.id === mail.id);
+    const updatedMails = [...mails];
     updatedMails[mailIndex] = updatedMail;
     setMails(updatedMails);
     // console.log(updatedMail,"updatedMail");
-    fetch(`${firebaseUrl}/${userName}/inbox/${mail.id}.json`,{
-      method : "PUT",
-      body: JSON.stringify(updatedMail)
+    fetch(`${firebaseUrl}/${userName}/inbox/${mail.id}.json`, {
+      method: "PUT",
+      body: JSON.stringify(updatedMail),
+    });
+  };
+
+  const deleteMail = (mail) => {
+    const updatedMails = mails.filter((i) => i.id !== mail.id);
+    setMails(updatedMails);
+
+    fetch(`${firebaseUrl}/${userName}/inbox/${mail.id}.json`, {
+      method : "DELETE"
     })
-  }
+  };
 
   return (
     <div className={classes.inbox}>
@@ -59,25 +67,36 @@ const Inbox = () => {
         Inbox ({countUnReadMails} - unread mails)
       </h3>
       {mails.map((mail) => (
-        <NavLink className={classes.navlink} key={mail.id} to={`/inbox/${mail.id}`}>
-            <Row 
-              onClick={openMail.bind(null,mail)}
-              key={mail.id} 
-              className={ mail.isRead ? classes.openedMail : classes.notOpenedMail }
-               >
-              <Col className="col-3"></Col>
-              <Col className="fw-bold col-2">{mail.from}</Col>
-              <Col className="col-7">
-                <div className={classes.content} >
-                  <strong>{mail.subject} - </strong> {mail.content}
-                </div>
-              </Col>
-            </Row>
-        </NavLink>
+        <Row key={mail.id} className={
+          mail.isRead ? classes.openedMail : classes.notOpenedMail
+        }>
+          <Col className="col-11">
+            <NavLink className={classes.navlink} to={`/inbox/${mail.id}`}>
+              <Row onClick={openMail.bind(null, mail)}>
+                <Col className="col-1"></Col>
+                <Col className="fw-bold col-2">{mail.from}</Col>
+                <Col className="col-9">
+                  <div className={classes.content}>
+                    <strong>{mail.subject} - </strong> {mail.content}
+                  </div>
+                </Col>
+              </Row>
+            </NavLink>
+          </Col>
+          <Col className="col-1">
+            <Button
+              onClick={deleteMail.bind(null, mail)}
+              style={{ padding: "0px 5px" }}
+              variant="danger"
+            >
+              Delete
+            </Button>
+          </Col>
+        </Row>
       ))}
       <NavLink className={classes.navlink} to="/compose-mail">
         <Button className={classes.composeBtn} variant="success">
-            Compose
+          Compose
         </Button>
       </NavLink>
     </div>

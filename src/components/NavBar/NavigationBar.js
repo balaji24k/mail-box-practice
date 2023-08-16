@@ -17,6 +17,24 @@ const NavigationBar = () => {
   return (
     <div>
       <Navbar bg="black" data-bs-theme="dark">
+        {!userEmail && (
+          <Navbar.Brand style={{marginLeft:"700px"}}>
+            <NavLink
+              to="/login"
+              activeClassName={classes.activeLink}
+              className={classes.navlink}
+            >
+              Login
+            </NavLink>
+            <NavLink
+              to="/signup"
+              activeClassName={classes.activeLink}
+              className={classes.navlink}
+            >
+              Signup
+            </NavLink>
+          </Navbar.Brand>
+        )}
         {userEmail && (
           <>
             <Col className="col-4">

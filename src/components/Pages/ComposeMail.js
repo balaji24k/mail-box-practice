@@ -24,15 +24,18 @@ const ComposeMail = () => {
 
 	const SubmitHandler = (event) => {
     event.preventDefault();
-   
+
+    // sending data to the outbox
     const receiverEmail = toEmailRef.current.value;
     const receiverName = receiverEmail.split("@")[0];
+
     const sentMessage = {
-      to: toEmailRef.current.value,
+      toEmail : receiverEmail,
+      to: receiverName,
       subject: subjectRef.current.value,
       content: editorState.getCurrentContent().getPlainText(),
     };
-    // sending data to the outbox
+
     fetch(`${firebaseUrl}/${userName}/sentbox.json`, {
 			method : "POST",
 			body : JSON.stringify(sentMessage)
@@ -49,10 +52,11 @@ const ComposeMail = () => {
 		
     //Sending data to inbox of the user
 		const receiverMessage = {
-			from: userEmail,
+			from: userName,
+      fromMail : userEmail,
 			subject: subjectRef.current.value,
 			content: editorState.getCurrentContent().getPlainText(),
-			read: false,
+			isRead: false,
 		}
     fetch(`${firebaseUrl}/${receiverName}/inbox.json`, {
 			method : "POST",

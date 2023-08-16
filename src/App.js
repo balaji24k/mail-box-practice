@@ -6,6 +6,7 @@ import NavigationBar from './components/NavBar/NavigationBar';
 import SentBox from './components/Pages/SentBox';
 import Inbox from "./components/Pages/Inbox";
 import { useSelector } from 'react-redux';
+import TotalMail from './components/Pages/TotalMail';
 
 
 function App() {
@@ -14,27 +15,31 @@ function App() {
     <>
       <NavigationBar/>
       <Switch>
-        <Route path="/login">
+        <Route exact path="/login">
           {isLoggedIn && <Redirect to="inbox"/>}
           {!isLoggedIn && <LoginPage/>}
         </Route>
-        <Route path="/signup">
+        <Route exact path="/signup">
           {isLoggedIn && <Redirect to="inbox"/>}
           {!isLoggedIn && <SignUpPage/>}
         </Route>
-        <Route path="/compose-mail">
+        <Route exact path="/compose-mail">
           {isLoggedIn && <ComposeMail/>}
           {!isLoggedIn && <Redirect to="login"/>}
         </Route>
-        <Route path="/inbox">
+        <Route exact path="/inbox">
           {isLoggedIn && <Inbox/>}
           {!isLoggedIn && <Redirect to="login"/>}
         </Route>
-        <Route path="/sentbox">
+        <Route exact path="/inbox/:id">
+          {isLoggedIn && <TotalMail/>}
+          {!isLoggedIn && <Redirect to="login"/>}
+        </Route>
+        <Route exact path="/sentbox">
           {isLoggedIn && <SentBox/>}
           {!isLoggedIn && <Redirect to="login"/>}
         </Route>
-        <Route path="*">
+        <Route exact path="*">
           {isLoggedIn && <Redirect to="/inbox"/>}
           {!isLoggedIn && <Redirect to="login"/>}
         </Route>

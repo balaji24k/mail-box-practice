@@ -18,7 +18,7 @@ const ComposeMail = () => {
 	const subjectRef = useRef();
 
   const onEditorStateChange = (editorState) => {
-    console.log(editorState.getCurrentContent().getPlainText(), "editorstate");
+    // console.log(editorState.getCurrentContent().getPlainText(), "editorstate");
     setEditorState(editorState);
   };
 
@@ -26,7 +26,7 @@ const ComposeMail = () => {
     event.preventDefault();
    
     const receiverEmail = toEmailRef.current.value;
-    const receiverName = receiverEmail.split("")[0];
+    const receiverName = receiverEmail.split("@")[0];
     const sentMessage = {
       to: toEmailRef.current.value,
       subject: subjectRef.current.value,
@@ -63,6 +63,7 @@ const ComposeMail = () => {
 		})
 		.then(data => {
 			console.log(data,"data")
+      alert("Mail sent succesfully")
 		})
   };
 
@@ -77,7 +78,7 @@ const ComposeMail = () => {
           marginTop: "2rem",
         }}
       >
-        <Card.Title style={{ fontFamily: "Arial", fontWeight: "bolder" }}>
+        <Card.Title className="fw-bold">
           Compose Email
         </Card.Title>
         <FloatingLabel label="To:">
@@ -86,14 +87,8 @@ const ComposeMail = () => {
         <FloatingLabel label="Subject">
           <FormControl type="text" placeholder="Subject" ref={subjectRef} />
         </FloatingLabel>
-        <Card.Body
-          style={{
-            backgroundColor: "black",
-            color: "white",
-            textAlign: "left",
-          }}
-        >
-          Compose email
+        <Card.Body>
+          <strong>Compose Email</strong>
           <Editor
             editorState={editorState}
             toolbarClassName="toolbarClassName"
@@ -102,7 +97,7 @@ const ComposeMail = () => {
             onEditorStateChange={onEditorStateChange}
           />
         </Card.Body>
-        <Button variant="success" type="submit">
+        <Button type="submit">
           Send
         </Button>
       </Card>

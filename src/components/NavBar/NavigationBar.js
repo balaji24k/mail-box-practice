@@ -16,13 +16,13 @@ const NavigationBar = () => {
 
   return (
     <div>
-      <Navbar bg="dark" data-bs-theme="dark">
+      <Navbar bg="black" data-bs-theme="dark">
         {userEmail && (
           <>
             <Col className="col-4">
               <h4 className={classes.userName}>User: {userName}</h4>
             </Col>
-            <Col className="col-6">
+            <Col className="col-7">
               <Navbar.Brand className="m-4">
                 <NavLink
                   to="/compose-mail"
@@ -51,7 +51,7 @@ const NavigationBar = () => {
                 </NavLink>
               </Navbar.Brand>
             </Col>
-            <Col className="col-2">
+            <Col className="col-1">
               <Button onClick={logoutHandler} variant="danger">
                 Logout
               </Button>

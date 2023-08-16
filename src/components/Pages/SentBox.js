@@ -14,20 +14,20 @@ const SentBox = () => {
 
 
   useEffect(() => {
-    fetch(`${firebaseUrl}/${userName}/sentbox.json`)
-      .then((response) => {
-        return response.json();
-      })
-      .then((data) => {
-        // console.log(data, "data after refresh sentbox");
-        const loadedMails = [];
-        for (let key in data) {
-          let mail = { id: key, ...data[key] };
-          loadedMails.push(mail);
-        }
-        // console.log(loadedMails, "loadedMails");
-        setMails(loadedMails);
-      });
+		fetch(`${firebaseUrl}/${userName}/sentbox.json`)
+			.then((response) => {
+				return response.json();
+			})
+			.then((data) => {
+				// console.log(data, "data after refresh sentbox");
+				const loadedMails = [];
+				for (let key in data) {
+					let mail = { id: key, ...data[key] };
+					loadedMails.push(mail);
+				}
+				// console.log(loadedMails, "loadedMails");
+				setMails(loadedMails);
+			});
   }, [userName]);
 
   const deleteMail = (mail) => {

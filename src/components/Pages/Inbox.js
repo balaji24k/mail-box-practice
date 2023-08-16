@@ -22,7 +22,8 @@ const Inbox = () => {
   // console.log(countUnReadMails,"count");
 
   useEffect(() => {
-    fetch(`${firebaseUrl}/${userName}/inbox.json`)
+    setInterval(() => {
+      fetch(`${firebaseUrl}/${userName}/inbox.json`)
       .then((response) => {
         return response.json();
       })
@@ -33,9 +34,10 @@ const Inbox = () => {
           let mail = { id: key, ...data[key] };
           loadedMails.push(mail);
         }
-        // console.log(loadedMails, "loadedMails");
+        console.log(loadedMails, "loadedMails");
         setMails(loadedMails);
       });
+    }, 3000)
   }, [userName]);
 
   const openMail = (mail) => {

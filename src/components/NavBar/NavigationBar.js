@@ -12,7 +12,6 @@ const NavigationBar = () => {
   const userName = userEmail && userEmail.split("@")[0];
 
   // console.log(inboxMails, "inboxMails nav")
-
   let countUnReadMails = 0;
   for (let mail of inboxMails) {
     if (!mail.isRead) {

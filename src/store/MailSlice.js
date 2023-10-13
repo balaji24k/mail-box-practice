@@ -20,7 +20,6 @@ const MailSlice = createSlice({
             state.inboxMails = updatedInbox;
         },
         addSentboxMail(state,action) {
-            // console.log(action.payload,"sentbox slice");
             state.sentboxMails.push(action.payload);
         },
         removeSentboxMail(state,action) {

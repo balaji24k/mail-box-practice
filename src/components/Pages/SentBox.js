@@ -1,42 +1,32 @@
-import { useEffect, useState } from "react";
 import { NavLink } from "react-router-dom/cjs/react-router-dom.min";
 import classes from "./Inbox.module.css";
-import { Row, Col, Button, Container } from "react-bootstrap";
+import { Row, Col, Button, Container, Spinner } from "react-bootstrap";
+import { useDispatch, useSelector } from "react-redux";
+import { mailActions } from "../../store/MailSlice";
+import useHttp from "../../hooks/useHttp";
+import { useState } from "react";
 
 const SentBox = () => {
-  const firebaseUrl =
-    "https://react-projects-aaebd-default-rtdb.firebaseio.com/mail-box";
+  const dispatch = useDispatch();
+  const mails = useSelector(state => state.mails.sentboxMails);
+  const [isLoading, setIsLoading] = useState(null);
 
+  const sendRequest = useHttp();
   const userEmail = localStorage.getItem("email");
   const userName = userEmail.split("@")[0];
 
-  const [mails, setMails] = useState([]);
-
-
-  useEffect(() => {
-		fetch(`${firebaseUrl}/${userName}/sentbox.json`)
-			.then((response) => {
-				return response.json();
-			})
-			.then((data) => {
-				// console.log(data, "data after refresh sentbox");
-				const loadedMails = [];
-				for (let key in data) {
-					let mail = { id: key, ...data[key] };
-					loadedMails.push(mail);
-				}
-				// console.log(loadedMails, "loadedMails");
-				setMails(loadedMails);
-			});
-  }, [userName]);
-
-  const deleteMail = (mail) => {
-    const updatedMails = mails.filter((i) => i.id !== mail.id);
-    setMails(updatedMails);
-
-    fetch(`${firebaseUrl}/${userName}/sentbox/${mail.id}.json`, {
-      method : "DELETE"
-    })
+  const deleteMail = async (mail) => {
+    try {
+      setIsLoading(mail.id);
+      await sendRequest({
+        endPoint: `${userName}/sentbox/${mail.id}`,
+        method : "DELETE"
+      })
+      setIsLoading(null);
+      dispatch(mailActions.removeSentboxMail(mail));
+    } catch (error) {
+      console.log(error,"deletemail sentbox");
+    }
   };
 
   return (
@@ -64,12 +54,20 @@ const SentBox = () => {
               </NavLink>
             </Col>
             <Col className="col-1">
-              <Button
-                onClick={deleteMail.bind(null, mail)}
+              <Button 
+                onClick={deleteMail.bind(null, mail)} 
                 style={{ padding: "0px 5px" }}
                 variant="danger"
               >
-                Delete
+                {(isLoading === mail.id) ?   
+                  <span>
+                    <Spinner as="span" animation="border" size="sm" role="status" 
+                      aria-hidden="true"
+                    />
+                  </span>
+                  : 
+                  'Delete'
+                }
               </Button>
             </Col>
           </Row>

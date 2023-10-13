@@ -1,18 +1,19 @@
 import React, { useState, useRef } from "react";
 import { EditorState } from "draft-js";
 import { Editor } from "react-draft-wysiwyg";
-import { Button, Card, Form, FloatingLabel, FormControl } from "react-bootstrap";
+import { Button, Card, Form, FloatingLabel, FormControl, Spinner } from "react-bootstrap";
 import { useDispatch, useSelector } from "react-redux";
 import "react-draft-wysiwyg/dist/react-draft-wysiwyg.css";
 import { mailActions } from "../../store/MailSlice";
+import useHttp from "../../hooks/useHttp";
 
 const ComposeMail = () => {
   const dispatch = useDispatch();
 
+  const sendRequest = useHttp();
+
 	const userEmail = useSelector(state => state.auth.userEmail);
 	const userName = userEmail && userEmail.split("@")[0];
-
-	const firebaseUrl = "https://react-projects-aaebd-default-rtdb.firebaseio.com/mail-box";
 
   const [editorState, setEditorState] = useState(EditorState.createEmpty());
 
@@ -20,84 +21,76 @@ const ComposeMail = () => {
 	const subjectRef = useRef();
 
   const onEditorStateChange = (editorState) => {
-    // console.log(editorState.getCurrentContent().getPlainText(), "editorstate");
     setEditorState(editorState);
   };
 
-	const SubmitHandler = (event) => {
-    event.preventDefault();
+  const [isLoading, setIsLoading] = useState(false);
 
-    // sending data to the outbox
-    const receiverEmail = toEmailRef.current.value;
-    const receiverName = receiverEmail.split("@")[0];
-
-    const dateObj = new Date();
-    const year = dateObj.getFullYear();
-    const month = dateObj.getMonth()+1; // +1 Because Months are 0-indexed
-    const day = dateObj.getDate();
-    const hours = dateObj.getHours();
-    const minutes = dateObj.getMinutes();
-
-    const date = {day,month,year};
-    const time = {hours, minutes};
-
-    console.log(date,"date compose");
-    console.log(time, "time compose");
-
-    const sentMessage = {
-      date : date,
-      time : time,
-      toMail : receiverEmail,
-      to: receiverName,
-      subject: subjectRef.current.value,
-      content: editorState.getCurrentContent().getPlainText(),
-    };
-
-    fetch(`${firebaseUrl}/${userName}/sentbox.json`, {
-			method : "POST",
-			body : JSON.stringify(sentMessage)
-		})
-		.then(response => {
-			// console.log(response);
-			toEmailRef.current.value = "";
-			subjectRef.current.value = "";
-			setEditorState("");
-      return response.json()
-		})
-    .then(data => {
+	const SubmitHandler = async (event) => {
+    try {
+      event.preventDefault();
+      setIsLoading(true);
+      const receiverEmail = toEmailRef.current.value;
+      const subject = subjectRef.current.value;
+  
+      const receiverName = receiverEmail.split("@")[0];
+  
+      toEmailRef.current.value = "";
+      subjectRef.current.value = "";
+      setEditorState("");
+  
+      const dateObj = new Date();
+      const year = dateObj.getFullYear();
+      const month = dateObj.getMonth()+1; // +1 Because Months are 0-indexed
+      const day = dateObj.getDate();
+      const hours = dateObj.getHours();
+      const minutes = dateObj.getMinutes();
+  
+      const date = {day,month,year};
+      const time = {hours, minutes};
+  
+      // sending to sentbox
+      const sentMessage = {
+        date : date,
+        time : time,
+        toMail : receiverEmail,
+        to: receiverName,
+        subject: subject,
+        content: editorState.getCurrentContent().getPlainText(),
+      };
+      // custom hook
+      const data = await sendRequest({
+        endPoint : `${userName}/sentbox`,
+        method : "POST",
+        body : sentMessage,
+      });
+      // console.log(data, "after post")
       const sentData = { id : data.name, ...sentMessage}
       dispatch(mailActions.addSentboxMail(sentData));
-    })
-		.catch((error) => {
-			console.log(error);
-		});
-		
-    //Sending data to inbox of the user
-		const receiverMessage = {
-      date : date,
-      time : time,
-			from: userName,
-      fromMail : userEmail,
-			subject: subjectRef.current.value,
-			content: editorState.getCurrentContent().getPlainText(),
-			isRead: false,
-		}
-
-    fetch(`${firebaseUrl}/${receiverName}/inbox.json`, {
-			method : "POST",
-			body : JSON.stringify(receiverMessage)
-		})
-		.then(response => {
-			return response.json()
-		})
-		.then(data => {
-      const receiverData = {...receiverMessage, id:data.name};
-      dispatch(mailActions.addInboxMail(receiverData));
-			// console.log(data,"data")
-      alert("Mail sent succesfully")
-		})
+  
+      //Sending data to inbox of the user
+      const receiverMessage = {
+        date : date,
+        time : time,
+        from: userName,
+        fromMail : userEmail,
+        subject: subject,
+        content: editorState.getCurrentContent().getPlainText(),
+        isRead: false,
+      }
+  
+      // custom hook
+      await sendRequest({
+        endPoint : `${receiverName}/inbox`,
+        method : "POST",
+        body : receiverMessage,
+      });
+      setIsLoading(false);
+      // console.log(data, "after post")
+    } catch (error) {
+      console.log(error,"at compose mail");
+    }
   };
-
 
   return (
     <Form onSubmit={SubmitHandler}>
@@ -129,7 +122,20 @@ const ComposeMail = () => {
           />
         </Card.Body>
         <Button type="submit">
-          Send
+        {isLoading ?   
+          <span>
+            Sending...
+            <Spinner 
+              as="span" 
+              animation="border" 
+              size="sm" 
+              role="status" 
+              aria-hidden="true"
+            />
+          </span>
+          : 
+          'Send'
+        }
         </Button>
       </Card>
     </Form>

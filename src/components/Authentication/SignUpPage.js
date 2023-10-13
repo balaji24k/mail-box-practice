@@ -1,131 +1,37 @@
-import { Button, Form, Nav } from "react-bootstrap";
-import React, { useRef, useState } from "react";
+import { useState } from "react";
 import classes from "./Auth.module.css";
-import { NavLink, useHistory } from "react-router-dom";
-import { BsEye, BsEyeSlash } from "react-icons/bs";
+import { useHistory } from "react-router-dom";
+import useHttp from "../../hooks/useHttp";
+import SignupForm from "./SignupForm";
 
 const SignUpPage = () => {
-  const emailInputRef = useRef();
-  const passwordInputRef = useRef();
-  const confirmpasswordInputRef = useRef();
-
   const history = useHistory();
 
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const sendRequest = useHttp();
 
-  const showPasswordHandler = () => {
-    setShowPassword(!showPassword);
-  };
-
-  const showConfirmPasswordHandler = () => {
-    setShowConfirmPassword(!showConfirmPassword);
-  };
-
-  const submitHandler = (event) => {
-    event.preventDefault();
-
-    const enteredEmail = emailInputRef.current.value;
-    const enteredPassword = passwordInputRef.current.value;
-    const confirmpassword = confirmpasswordInputRef.current.value;
-
-    if (enteredPassword !== confirmpassword) {
-      alert("Password and confirm password must match");
-    } 
-		else {
-      emailInputRef.current.value = "";
-      passwordInputRef.current.value = "";
-      confirmpasswordInputRef.current.value = "";
-      fetch(
-        "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyAL0G6pWurs04AgANQC86y9RqLTit1CQP4",
-        {
-          method: "POST",
-          body: JSON.stringify({
-            email: enteredEmail,
-            password: enteredPassword,
-            returnSecureToken: true,
-          }),
-          headers: {
-            "Content-Type": "application/json",
-          },
-        }
-      ).then((res) => {
-        if (res.ok) {
-          // console.log("Account created succesfullly");
-          alert("Account created succesful");
-          history.replace("/login");
-        } else {
-          return res.json().then((data) => {
-            // console.log(data);
-            let errorMessage = "Authentication failed!";
-            if (data && data.error && data.error.message) {
-              errorMessage = data.error.message;
-            }
-
-            alert(errorMessage);
-          });
-        }
+  const submitHandler = async(email,password) => {
+    try {
+      setIsLoading(true);
+      const data = await sendRequest({
+        url : "https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyAZmAyELegQIUlAxdcsCJ-P-HtMA5EvRis",
+        method : "POST",
+        body :  { email,  password, returnSecureToken: true}
       });
+      console.log(data,"success signup")
+      setIsLoading(true); 
+      history.replace('/login');
+      alert("Accouct Created Succesfully!")
+    } 
+    catch (error) {
+      setIsLoading(false);
+      alert(error);
     }
   };
   return (
     <section className={classes.box}>
       <h1>SignUp</h1>
-      <Form onSubmit={submitHandler}>
-        <Form.Group className="mb-3">
-          <Form.Label className={classes.label} >Email</Form.Label>
-          <Form.Control
-            type="text"
-            placeholder="Email"
-            required
-            ref={emailInputRef}
-          />
-        </Form.Group>
-        <Form.Group className="mb-3">
-          <Form.Label className={classes.label} >Password</Form.Label>
-          <div className="input-group">
-            <Form.Control
-              type={showPassword ? "text" : "password"}
-              placeholder="Password"
-              ref={passwordInputRef}
-            />
-            <Button
-              className="input-group-append"
-              onClick={showPasswordHandler}
-            >
-              {showPassword ? <BsEyeSlash /> : <BsEye />}
-            </Button>
-          </div>
-        </Form.Group>
-
-        <Form.Group className="mb-3 ">
-          <Form.Label className={classes.label} >Confirm Password</Form.Label>
-          <div className="input-group">
-            <Form.Control
-              type={showConfirmPassword ? "text" : "password"}
-              placeholder="Password"
-              ref={confirmpasswordInputRef}
-            />
-            <Button
-              className="input-group-append"
-              onClick={showConfirmPasswordHandler}
-            >
-              {showConfirmPassword ? <BsEyeSlash /> : <BsEye />}
-            </Button>
-          </div>
-        </Form.Group>
-
-        <div>
-          <Button variant="success pl-2" type="submit">
-            Create Account
-          </Button>
-        </div>
-        <Nav>
-          <NavLink to="/login" className={classes.navlink} >
-            Have an Account?
-          </NavLink>
-        </Nav>
-      </Form>
+      <SignupForm submitHandler={submitHandler} isLoading={isLoading} />
     </section>
   );
 };
